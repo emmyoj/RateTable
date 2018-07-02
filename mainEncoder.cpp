@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 	//if(argc = 0){
 	//	target speed = 30;
 	//	}
-	exp_time = atoi(argv[2]);
+	exp_time = atoi(argv[2])*1000000;
 
 	cout << "experiment time: " << exp_time << "\n";
 	if(wiringPiSetup() < 0){
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 		}
 
 	}
-	return 0;
+return 0;
 
 }
 
