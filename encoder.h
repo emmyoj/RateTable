@@ -14,6 +14,7 @@ struct encoder_struct
     volatile long value;
     volatile int lastEncoded;
     double speed;
+		double position;
 
 	
 };
