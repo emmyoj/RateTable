@@ -21,7 +21,7 @@ void updateEncoders()
 	if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoder.value--;
 	cout << encoder.lastEncoded << " " << encoded << " ";
 	encoder.lastEncoded = encoded;
-
+  encoder.position = encoder.value / 18140.79 *360;
 	cout << encoder.value << endl;
 
 
@@ -53,7 +53,7 @@ preTime = curTime;
 }
 
 
-/*   two channel and both direction
+   two channel and both direction
 void setUpEncoder(int a, int b)
 {
 
@@ -102,8 +102,8 @@ void setUpEncoder(int a, int b)
 
 	pinMode(encoder.pin_a, INPUT);
 	pinMode(encoder.pin_b, INPUT);
-	pullUPDNControl(encoder.pin_a, PUD_UP);
-	pullUpDNControl(encoder.pin_b, PUD_UP);
+	pullUpDnControl(encoder.pin_a, PUD_UP);
+	pullUpDnControl(encoder.pin_b, PUD_UP);
 	wiringPiISR(encoder.pin_a, INT_EDGE_BOTH, &updateEncoders);
 	wiringPiISR(encoder.pin_b, INT_EDGE_BOTH, &updateEncoders);
 }

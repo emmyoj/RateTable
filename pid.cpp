@@ -35,8 +35,7 @@ double pid::setPWM(double target, double speed)
 	error = target - speed; // error = set point - process variable
 
 	integral = integral + error * dt; // new integral = previous integral + error * change in time
-	if(integral *ki > 3 || integral * ki < -3)
-		integral =0;
+	if(integral *ki > 3 || integral * ki < -3)integral = 0;
 	double der = (error - preError) / dt; // derivative = (error - previous error) / change in time
 	//D output, I output, P output
 	double output = der * kd + integral * ki + kp * error; // controller output = derivative * derivative time const + integral * integral time const + proportional gain * error
