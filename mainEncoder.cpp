@@ -87,7 +87,8 @@ int main(int argc, char** argv)
 	//int speed = encoder.speed;
 	double sampleTime = 0.1; // sec? or micro seconds?
 	double startTime = clock();
-	double target_position = 0;//rpm ? 180
+	double target_position = 0;//degrees. 0 - 360 degree range
+	double target_speed = 0;//rpm ? 180
 	int exp_time = 0;// user input time experiment will run... without conversion, user input needs to be in microseconds >= 1000000
 	int target_time = 0; //exp_time + clock()
 	double controlTime;
@@ -104,7 +105,9 @@ int main(int argc, char** argv)
 	//if(argc = 0){
 	//	target speed = 30;
 	//	}
-	exp_time = atoi(argv[2])*1000000;
+	target_speed = atoi(argv[2]);
+
+	exp_time = atoi(argv[3])*1000000;
 
 	cout << "experiment time: " << exp_time << "\n";
 	if(wiringPiSetup() < 0){
