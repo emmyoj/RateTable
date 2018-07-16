@@ -21,7 +21,7 @@ void updateEncoders()
 	if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoder.value--;
 	cout << encoder.lastEncoded << " " << encoded << " ";
 	encoder.lastEncoded = encoded;
-  encoder.position = encoder.value / 18140.79 *360;
+  encoder.position = float(encoder.value / 18140.79 *360);
 	cout << encoder.value << endl;
 
 
