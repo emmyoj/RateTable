@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <wiringPi.h> 
 #include <iostream>
+#include <iomanip>
 #include <softPwm.h>
 #include <time.h>
 #include "pid.h"
@@ -18,18 +19,21 @@ int main(int argc, char** argv)
 	const double MAX_VAL = 15;
 	const double MIN_VAL = -15;
 	const double KP = 0.5;
-  const double KI = 0.01;
-  const double KD = 0;
+	const double KI = 0.01;
+	const double KD = 0;
 	int pwmPin = 0; // 0 in wiringPi = 11 in RasPi
 	int range = 100; //10000 / frequency. change based on frequency
 	int dirPin = 2; // 2 in wiringPi = 13 in RasPi
 	int pwmVal = 0; // (duty cycle * range)/100
+	double pos_error;
+	double error = 0.1;
+	//float float_error;// estimated error range for final position
 	//int speed = encoder.speed;
 	double sampleTime = 0.1; // sec? or micro seconds?
 	double startTime = clock();
 	double target_position = 0;//rpm ? 180
-	int exp_time = 0;// user input time experiment will run... without conversion, user input needs to be in microseconds >= 1000000
-	int target_time = 0; //exp_time + clock()
+	//	int exp_time = 0;// user input time experiment will run... without conversion, user input needs to be in microseconds >= 1000000
+//	int target_time = 0; //exp_time + clock()
 	double controlTime;
 
 
@@ -40,13 +44,17 @@ int main(int argc, char** argv)
 	//cout << argv[1][2] << "\n";
 
 	target_position = atoi(argv[1]);
+	error = atoi(argv[2]);
+	//float_error = (float)error / 1000;
+//	printf("%f ", error);
+	cout << "error:  " << error << "\n";
 	//if argc is empty, set speed to default value
 	//if(argc = 0){
 	//	target speed = 30;
 	//	}
-	exp_time = atoi(argv[2])*1000000;
+	//	exp_time = atoi(argv[2])*1000000;
 
-	cout << "experiment time: " << exp_time << "\n";
+	//	cout << "experiment time: " << exp_time << "\n";
 	if(wiringPiSetup() < 0){
 		//cout << "fail now" << endl;
 		fprintf(stderr, "Unable to initialize wiringPi:%s\n",strerror(errno));
@@ -56,25 +64,23 @@ int main(int argc, char** argv)
 	softPwmCreate (pwmPin, pwmVal, range);
 	digitalWrite(dirPin, LOW) ;
 	pinMode(dirPin, OUTPUT) ;
-	
-		 //double dt, double maxVal, double minVal, double kp, double ki, double kd,double preError = 0
-	
+
+	//double dt, double maxVal, double minVal, double kp, double ki, double kd,double preError = 0
+
 	pid pid_(sampleTime, MAX_VAL, MIN_VAL, KP, KI, KD);
 
-	target_time = exp_time + clock();
-	cout << "target time: " << target_time << "\n";
-	while(clock() < target_time) //while (current encoder value is not wthin range of target encoder value +/- error)
+	//	target_time = exp_time + clock();
+	//cout << "target time: " << target_time << "\n";
+
+	while (encoder.position <= (target_position + error)) 
 	{
 		controlTime = clock() - startTime;
-		//cout << controlTime << endl;
 		if(controlTime >= sampleTime * CLOCKS_PER_SEC)
 		{
-			//cout << "control time " << controlTime / CLOCKS_PER_SEC << endl;
 			startTime += controlTime;
 			pwmVal = pid_.setPWM(target_position, encoder.position);
 			softPwmWrite (pwmPin, abs(pwmVal) + PWM_RANGE);
 			cout << "pwm " << pwmVal << endl;
-			cout << "position " << target_position << " " << encoder.position << endl; //encoder.speed << endl;
 			if(pwmVal > 0)
 			{
 				digitalWrite(dirPin, LOW);
@@ -89,6 +95,9 @@ int main(int argc, char** argv)
 		}
 
 	}
-    return 0;
+	cout <<"\n" << "final position: " << encoder.position << "\n";
+	pos_error = encoder.position - target_position;
+	cout << fixed << setprecision(4) << "positional error = " << pos_error << "\n";
+	return 0;
 }
 
