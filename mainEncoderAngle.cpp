@@ -26,7 +26,8 @@ int main(int argc, char** argv)
 	int dirPin = 2; // 2 in wiringPi = 13 in RasPi
 	int pwmVal = 0; // (duty cycle * range)/100
 	double pos_error;
-	double error = 0.1; //estimated error range for final position
+	double input_range = 0.1; //estimated error range for final position. User input
+	//double error; // Target position - current position
 	//float float_error;
 	//int speed = encoder.speed;
 	double sampleTime = 0.1; // sec? or micro seconds?
@@ -41,14 +42,15 @@ int main(int argc, char** argv)
 	cout << "start the program" << endl;
 
 	cout << "You have entered " << argc << " arguments:" << "\n";
-	//cout << argv[1][2] << "\n";
+	cout << argv[1][2] << "\n";
 
 	target_position = atof(argv[1]);
-	error = atof(argv[2]); //atof?
+	input_range = atof(argv[2]); 
 	//float_error = (float)error / 1000;
 	//	printf("%f ", error);
 	cout << "target_position: "<< target_position << "\n";
-	cout << "error:  " << error << "\n";
+	cout << "error range:  " << input_range << "\n";
+	cout << "encoder position: " << encoder.position << "\n";
 	//if argc is empty, set speed to default value
 
 	//	exp_time = atoi(argv[2])*1000000;
@@ -68,10 +70,11 @@ int main(int argc, char** argv)
 
 	pid pid_(sampleTime, MAX_VAL, MIN_VAL, KP, KI, KD);
 
-	//	target_time = exp_time + clock();
-	//cout << "target time: " << target_time << "\n";
 
-	while (encoder.position <= (target_position + error))//+- error 
+//	error = abs(target_position - encoder.position);
+	//while (error > input_range)
+	while (abs(target_position - encoder.position) > input_range) 
+//	while (encoder.position <= (target_position + input_range))
 	{
 		controlTime = clock() - startTime;
 		if(controlTime >= sampleTime * CLOCKS_PER_SEC)
@@ -80,6 +83,8 @@ int main(int argc, char** argv)
 			pwmVal = pid_.setPWM(target_position, encoder.position);
 			softPwmWrite (pwmPin, abs(pwmVal) + PWM_RANGE);
 			cout << "pwm " << pwmVal << endl;
+			cout << "angle: " << encoder.position << "\n";
+			cout << "target angle: " << target_position <<"\n";
 			if(pwmVal > 0)
 			{
 				digitalWrite(dirPin, LOW);
@@ -95,7 +100,7 @@ int main(int argc, char** argv)
 
 	}
 	cout <<"\n" << "final position: " << encoder.position << "\n";
-	pos_error = encoder.position - (target_position+error);
+	pos_error = encoder.position - (target_position + input_range);
 	cout << fixed << setprecision(4) << "positional error = " << pos_error << "\n";
 	return 0;
 }
