@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	int pwmVal = 0; // (duty cycle * range)/100
 	double pos_error;
 	double input_range = 0.1; //estimated error range for final position. User input
-	//double error; // Target position - current position
+	double error; // Target position - current position
 	//float float_error;
 	//int speed = encoder.speed;
 	double sampleTime = 0.1; // sec? or micro seconds?
@@ -71,10 +71,10 @@ int main(int argc, char** argv)
 	pid pid_(sampleTime, MAX_VAL, MIN_VAL, KP, KI, KD);
 
 
-//	error = abs(target_position - encoder.position);
-	//while (error > input_range)
-	while (abs(target_position - encoder.position) > input_range) 
-//	while (encoder.position <= (target_position + input_range))
+	error = abs(target_position - encoder.position);
+	while (error > input_range)
+		//while (abs(target_position - encoder.position) > input_range) 
+		//	while (encoder.position <= (target_position + input_range))
 	{
 		controlTime = clock() - startTime;
 		if(controlTime >= sampleTime * CLOCKS_PER_SEC)
@@ -97,10 +97,11 @@ int main(int argc, char** argv)
 			}
 			//if user input = space bar or enter, stop motor 
 		}
+		error = abs(target_position - encoder.position);
 
 	}
 	cout <<"\n" << "final position: " << encoder.position << "\n";
-	pos_error = encoder.position - (target_position + input_range);
+	pos_error = (target_position - input_range) - encoder.position;// encoder.position - (target_position + input_range);
 	cout << fixed << setprecision(4) << "positional error = " << pos_error << "\n";
 	return 0;
 }
