@@ -15,10 +15,10 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	const int PWM_RANGE = 4;
+	const int PWM_RANGE = 3;//4
 	const double MAX_VAL = 15;
 	const double MIN_VAL = -15;
-	const double KP = 0.5;
+	const double KP = 0.5;//0.5
 	const double KI = 0.01;
 	const double KD = 0;
 	int pwmPin = 0; // 0 in wiringPi = 11 in RasPi
@@ -28,17 +28,12 @@ int main(int argc, char** argv)
 	double pos_error;
 	double input_range = 0.1; //estimated error range for final position. User input
 	double error; // Target position - current position
-	//float float_error;
-	//int speed = encoder.speed;
 	double sampleTime = 0.1; // sec? or micro seconds?
 	double startTime = clock();
 	double target_position = 90;//rpm ? 180
-	//	int exp_time = 0;// user input time experiment will run... without conversion, user input needs to be in microseconds >= 1000000
-	//	int target_time = 0; //exp_time + clock()
 	double controlTime;
 
 
-	//wiringPiSetupGpio();
 	cout << "start the program" << endl;
 
 	cout << "You have entered " << argc << " arguments:" << "\n";
@@ -46,8 +41,6 @@ int main(int argc, char** argv)
 
 	target_position = atof(argv[1]);
 	input_range = atof(argv[2]); 
-	//float_error = (float)error / 1000;
-	//	printf("%f ", error);
 	cout << "target_position: "<< target_position << "\n";
 	cout << "error range:  " << input_range << "\n";
 	cout << "encoder position: " << encoder.position << "\n";
@@ -71,10 +64,8 @@ int main(int argc, char** argv)
 	pid pid_(sampleTime, MAX_VAL, MIN_VAL, KP, KI, KD);
 
 
-	error = abs(target_position - encoder.position);
-	while (error > input_range)
-		//while (abs(target_position - encoder.position) > input_range) 
-		//	while (encoder.position <= (target_position + input_range))
+	error = target_position - encoder.position;
+	while (abs(error) >= input_range)
 	{
 		controlTime = clock() - startTime;
 		if(controlTime >= sampleTime * CLOCKS_PER_SEC)
@@ -89,20 +80,24 @@ int main(int argc, char** argv)
 			{
 				digitalWrite(dirPin, LOW);
 				cout << "direction: CW" << endl;
+				error = target_position - encoder.position;
 			}
 			else
 			{
 				digitalWrite(dirPin, HIGH);
 				cout << "direction: CCW" << endl;
+				error = target_position - encoder.position;
 			}
-			//if user input = space bar or enter, stop motor 
+			error  = target_position - encoder.position;
 		}
-		error = abs(target_position - encoder.position);
+		digitalWrite(dirPin, LOW);
 
 	}
+	
 	cout <<"\n" << "final position: " << encoder.position << "\n";
-	pos_error = (target_position - input_range) - encoder.position;// encoder.position - (target_position + input_range);
-	cout << fixed << setprecision(4) << "positional error = " << pos_error << "\n";
+	cout << "target position: " << target_position + input_range << "\n";
+	//pos_error = target_position - input_range - encoder.position;
+	//cout << fixed << setprecision(6) << "positional error = " << pos_error << "\n";
 	return 0;
 }
 
