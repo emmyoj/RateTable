@@ -26,11 +26,11 @@ int main(int argc, char** argv)
 	int dirPin = 2; // 2 in wiringPi = 13 in RasPi
 	int pwmVal = 0; // (duty cycle * range)/100
 	double pos_error;
-	double input_range = 0.1; //estimated error range for final position. User input
+	float input_range = 0.1; //estimated error range for final position. User input
 	double error; // Target position - current position
 	double sampleTime = 0.1; // sec? or micro seconds?
 	double startTime = clock();
-	double target_position = 90;//rpm ? 180
+	int target_position = 90;//rpm ? 180
 	double controlTime;
 
 
@@ -80,24 +80,31 @@ int main(int argc, char** argv)
 			{
 				digitalWrite(dirPin, LOW);
 				cout << "direction: CW" << endl;
-				error = target_position - encoder.position;
+				//error = target_position - encoder.position;
 			}
 			else
 			{
 				digitalWrite(dirPin, HIGH);
 				cout << "direction: CCW" << endl;
-				error = target_position - encoder.position;
+				//error = target_position - encoder.position;
 			}
 			error  = target_position - encoder.position;
 		}
-		digitalWrite(dirPin, LOW);
-
+		pwmVal = 0;
 	}
-	
 	cout <<"\n" << "final position: " << encoder.position << "\n";
-	cout << "target position: " << target_position + input_range << "\n";
-	//pos_error = target_position - input_range - encoder.position;
-	//cout << fixed << setprecision(6) << "positional error = " << pos_error << "\n";
+	//	cout << "target position: " << target_position + input_range << "\n";
+	if (encoder.position >= target_position)
+	{
+		pos_error = (target_position + input_range) - encoder.position;
+		cout << "target position: " << target_position + input_range << "\n";
+	}
+	else
+	{
+		pos_error = (target_position - input_range) - encoder.position;
+		cout << "target position: " << target_position - input_range << "\n";
+	}
+	cout << fixed << setprecision(6) << "positional error = " << pos_error << "\n";
 	return 0;
 }
 
