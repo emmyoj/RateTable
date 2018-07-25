@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <softPwm.h>
 #include <time.h>
+#include <math.h>
 #include "pid.h"
 #include "encoder.h"
 using namespace std;
@@ -18,14 +19,13 @@ int main(int argc, char** argv)
 	const int PWM_RANGE = 3;//4
 	const double MAX_VAL = 15;
 	const double MIN_VAL = -15;
-	const double KP = 0.5;//0.5
-	const double KI = 0.01;
-	const double KD = 0;
+	const double KP = 0.75;//0.5
+	const double KI = 0.1;
+	const double KD = 0.2;
 	int pwmPin = 0; // 0 in wiringPi = 11 in RasPi
 	int range = 100; //10000 / frequency. change based on frequency
 	int dirPin = 2; // 2 in wiringPi = 13 in RasPi
 	int pwmVal = 0; // (duty cycle * range)/100
-	double pos_error;
 	float input_range = 0.1; //estimated error range for final position. User input
 	double error; // Target position - current position
 	double sampleTime = 0.1; // sec? or micro seconds?
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 
 
 	error = target_position - encoder.position;
-	while (abs(error) >= input_range)
+	while (fabs(error) >= input_range)
 	{
 		controlTime = clock() - startTime;
 		if(controlTime >= sampleTime * CLOCKS_PER_SEC)
@@ -90,21 +90,8 @@ int main(int argc, char** argv)
 			}
 			error  = target_position - encoder.position;
 		}
-		pwmVal = 0;
 	}
-	cout <<"\n" << "final position: " << encoder.position << "\n";
-	//	cout << "target position: " << target_position + input_range << "\n";
-	if (encoder.position >= target_position)
-	{
-		pos_error = (target_position + input_range) - encoder.position;
-		cout << "target position: " << target_position + input_range << "\n";
-	}
-	else
-	{
-		pos_error = (target_position - input_range) - encoder.position;
-		cout << "target position: " << target_position - input_range << "\n";
-	}
-	cout << fixed << setprecision(6) << "positional error = " << pos_error << "\n";
+	cout <<"\n" << "Summary\nTarget pos:" << target_position << ", Input range:" << input_range << ", Final pos:" << encoder.position <<", Exit error:" << error <<", Actual error:"<< target_position - encoder.position <<  "\n";
 	return 0;
 }
 

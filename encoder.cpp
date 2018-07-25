@@ -23,9 +23,6 @@ void updateEncoders()
 	encoder.lastEncoded = encoded;
 	encoder.position = float((encoder.value / 18140.64)*360);// 18140.79
 	//	cout << encoder.value << endl;
-
-
-
 }
 
 //two channel and two direction
