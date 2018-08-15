@@ -1,0 +1,4 @@
+Target Angle:       Range of Error:   pause 
+90                 0.5              5
+-45                 0.5              5
+45                  0.5              5
