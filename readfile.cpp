@@ -15,6 +15,7 @@ using namespace std;
 int main()
 {
 	int i = 0;
+	string pause;
 	ifstream file;
 	string data;
 	string filename;
@@ -40,14 +41,26 @@ int main()
 			command = exec_file + " ";
 		}
 		cout << data << " ";
-		command = command + data + " ";
+		if (i < 2)
+		{
+			command = command + data + " ";
+		}
 		if ((i % 3) == 2)
 		{
 			cout << endl;
 			cout << "Emily's command beging: " << command << " End of Emily's command\n";
-			system (command.c_str());
+			//system (command.c_str());
 		}
+
 		i++;
+		if (i > 2)
+		{
+			pause = data;
+			cout << "Pause Time: "<< pause << "\n";
+			cout << endl;
+			i = 0;
+		}
+
 	}
 	cout <<"\n";
 	return 0;
