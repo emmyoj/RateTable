@@ -8,6 +8,7 @@
 #include <bits/stdc++.h>
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
 #include <fstream>
 #include <string>
 using namespace std;
@@ -15,7 +16,7 @@ using namespace std;
 int main()
 {
 	int i = 0;
-	string pause;
+	int pause = 0;
 	ifstream file;
 	string data;
 	string filename;
@@ -49,15 +50,16 @@ int main()
 		{
 			cout << endl;
 			cout << "Emily's command beging: " << command << " End of Emily's command\n";
-			//system (command.c_str());
+			system (command.c_str());
 		}
 
 		i++;
 		if (i > 2)
 		{
-			pause = data;
+			pause = stoi(data);
 			cout << "Pause Time: "<< pause << "\n";
 			cout << endl;
+			sleep(pause);
 			i = 0;
 		}
 
