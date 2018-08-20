@@ -44,13 +44,8 @@ int main(int argc, char** argv)
 	cout << "target_position: "<< target_position << "\n";
 	cout << "error range:  " << input_range << "\n";
 	cout << "encoder position: " << encoder.position << "\n";
-	//if argc is empty, set speed to default value
-
-	//	exp_time = atoi(argv[2])*1000000;
-
-	//	cout << "experiment time: " << exp_time << "\n";
+	
 	if(wiringPiSetup() < 0){
-		//cout << "fail now" << endl;
 		fprintf(stderr, "Unable to initialize wiringPi:%s\n",strerror(errno));
 		return 1;
 	}
@@ -80,17 +75,18 @@ int main(int argc, char** argv)
 			{
 				digitalWrite(dirPin, LOW);
 				cout << "direction: CW" << endl;
-				//error = target_position - encoder.position;
 			}
 			else
 			{
 				digitalWrite(dirPin, HIGH);
 				cout << "direction: CCW" << endl;
-				//error = target_position - encoder.position;
 			}
 			error  = target_position - encoder.position;
 		}
 	}
+	//pwmVal = 0;
+	//pid_.setPWM (0, 0);
+	digitalWrite(dirPin, LOW);
 	cout <<"\n" << "Summary\nTarget pos:" << target_position << ", Input range:" << input_range << ", Final pos:" << encoder.position <<", Exit error:" << error <<", Actual error:"<< target_position - encoder.position <<  "\n";
 	return 0;
 }
